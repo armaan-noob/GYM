@@ -1,0 +1,560 @@
+package com.gym.management.dao;package com.gym.management.dao;package com.gym.management.dao;
+
+
+
+import com.gym.management.model.Member;
+
+import com.gym.management.util.DatabaseUtil;
+
+import com.gym.management.model.Member;import com.gym.management.model.Member;
+
+import java.sql.*;
+
+import java.util.ArrayList;import com.gym.management.util.DatabaseUtil;import com.gym.management.util.DatabaseUtil;
+
+import java.util.List;
+
+
+
+public class MemberDAOImpl implements MemberDAO {
+
+    @Overrideimport java.sql.*;import java.sql.*;
+
+    public Member create(Member member) throws Exception {
+
+        String sql = "INSERT INTO members (name, age, contact, email, membership_type, join_date, role, password, admin_id) " +import java.util.ArrayList;import java.util.ArrayList;
+
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+        import java.util.List;import java.util.List;
+
+        try (Connection conn = DatabaseUtil.getConnection();
+
+             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
+            
+
+            stmt.setString(1, member.getName());public class MemberDAOImpl implements MemberDAO {public class MemberDAOImpl implements MemberDAO {
+
+            stmt.setInt(2, member.getAge());
+
+            stmt.setString(3, member.getContact());    @Override    @Override
+
+            stmt.setString(4, member.getEmail());
+
+            stmt.setString(5, member.getMembershipType());    public Member create(Member member) throws Exception {    public Member create(Member member) throws Exception {
+
+            stmt.setDate(6, Date.valueOf(member.getJoinDate()));
+
+            stmt.setString(7, member.getUserRole());        String sql = "INSERT INTO members (name, age, contact, email, membership_type, join_date, role, password, admin_id) " +        String sql = "INSERT INTO members (name, age, contact, email, membership_type, join_date, role, password, admin_id) " +
+
+            stmt.setString(8, member.getPassword());
+
+            if (member.getAdminId() != null) {                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+                stmt.setInt(9, member.getAdminId());
+
+            } else {                
+
+                stmt.setNull(9, Types.INTEGER);
+
+            }        try (Connection conn = DatabaseUtil.getConnection();        try (Connection conn = DatabaseUtil.getConnection();
+
+            
+
+            int affectedRows = stmt.executeUpdate();             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
+            if (affectedRows == 0) {
+
+                throw new SQLException("Creating member failed, no rows affected.");            import com.gym.management.model.Member;
+
+            }
+
+                        stmt.setString(1, member.getName());import com.gym.management.util.DatabaseUtil;
+
+            try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
+
+                if (generatedKeys.next()) {            stmt.setInt(2, member.getAge());
+
+                    member.setId(generatedKeys.getInt(1));
+
+                } else {            stmt.setString(3, member.getContact());import java.sql.*;
+
+                    throw new SQLException("Creating member failed, no ID obtained.");
+
+                }            stmt.setString(4, member.getEmail());import java.util.ArrayList;
+
+            }
+
+            return member;            stmt.setString(5, member.getMembershipType());import java.util.List;
+
+        }
+
+    }            stmt.setDate(6, Date.valueOf(member.getJoinDate()));
+
+    
+
+    @Override            stmt.setString(7, member.getUserRole());public class MemberDAOImpl implements MemberDAO {
+
+    public Member findById(int id) throws Exception {
+
+        String sql = "SELECT * FROM members WHERE id = ?";            stmt.setString(8, member.getPassword());    @Override
+
+        
+
+        try (Connection conn = DatabaseUtil.getConnection();            if (member.getAdminId() != null) {    public Member create(Member member) throws Exception {
+
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+                            stmt.setInt(9, member.getAdminId());        String sql = "INSERT INTO members (name, age, contact, email, membership_type, join_date, role, password, admin_id) " +
+
+            stmt.setInt(1, id);
+
+            try (ResultSet rs = stmt.executeQuery()) {            } else {                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+                if (rs.next()) {
+
+                    return mapResultSetToMember(rs);                stmt.setNull(9, Types.INTEGER);        
+
+                }
+
+            }            }        try (Connection conn = DatabaseUtil.getConnection();
+
+            return null;
+
+        }                         PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
+    }
+
+                int affectedRows = stmt.executeUpdate();            
+
+    @Override
+
+    public Member findByEmail(String email) throws Exception {            if (affectedRows == 0) {            stmt.setString(1, member.getName());
+
+        String sql = "SELECT * FROM members WHERE email = ?";
+
+                        throw new SQLException("Creating member failed, no rows affected.");            stmt.setInt(2, member.getAge());
+
+        try (Connection conn = DatabaseUtil.getConnection();
+
+             PreparedStatement stmt = conn.prepareStatement(sql)) {            }            stmt.setString(3, member.getContact());
+
+            
+
+            stmt.setString(1, email);                        stmt.setString(4, member.getEmail());
+
+            try (ResultSet rs = stmt.executeQuery()) {
+
+                if (rs.next()) {            try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {            stmt.setString(5, member.getMembershipType());
+
+                    return mapResultSetToMember(rs);
+
+                }                if (generatedKeys.next()) {            stmt.setDate(6, Date.valueOf(member.getJoinDate()));
+
+            }
+
+            return null;                    member.setId(generatedKeys.getInt(1));            stmt.setString(7, member.getUserRole());
+
+        }
+
+    }                } else {            stmt.setString(8, member.getPassword());
+
+    
+
+    @Override                    throw new SQLException("Creating member failed, no ID obtained.");            if (member.getAdminId() != null) {
+
+    public List<Member> findAll() throws Exception {
+
+        String sql = "SELECT * FROM members ORDER BY name";                }                stmt.setInt(9, member.getAdminId());
+
+        List<Member> members = new ArrayList<>();
+
+                    }            } else {
+
+        try (Connection conn = DatabaseUtil.getConnection();
+
+             Statement stmt = conn.createStatement();            return member;                stmt.setNull(9, Types.INTEGER);
+
+             ResultSet rs = stmt.executeQuery(sql)) {
+
+                    }            }
+
+            while (rs.next()) {
+
+                members.add(mapResultSetToMember(rs));    }            
+
+            }
+
+        }                int affectedRows = stmt.executeUpdate();
+
+        return members;
+
+    }    @Override            if (affectedRows == 0) {
+
+
+
+    @Override    public Member findById(int id) throws Exception {                throw new SQLException("Creating member failed, no rows affected.");
+
+    public List<Member> findByAdminId(int adminId) throws Exception {
+
+        String sql = "SELECT * FROM members WHERE admin_id = ? ORDER BY name";        String sql = "SELECT * FROM members WHERE id = ?";            }
+
+        List<Member> members = new ArrayList<>();
+
+                            
+
+        try (Connection conn = DatabaseUtil.getConnection();
+
+             PreparedStatement stmt = conn.prepareStatement(sql)) {        try (Connection conn = DatabaseUtil.getConnection();            try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
+
+            
+
+            stmt.setInt(1, adminId);             PreparedStatement stmt = conn.prepareStatement(sql)) {                if (generatedKeys.next()) {
+
+            try (ResultSet rs = stmt.executeQuery()) {
+
+                while (rs.next()) {                                member.setId(generatedKeys.getInt(1));
+
+                    members.add(mapResultSetToMember(rs));
+
+                }            stmt.setInt(1, id);                } else {
+
+            }
+
+        }            try (ResultSet rs = stmt.executeQuery()) {                    throw new SQLException("Creating member failed, no ID obtained.");
+
+        return members;
+
+    }                if (rs.next()) {                }
+
+    
+
+    @Override                    return mapResultSetToMember(rs);            }
+
+    public void update(Member member) throws Exception {
+
+        String sql = "UPDATE members SET name = ?, age = ?, contact = ?, email = ?, " +                }            return member;
+
+                    "membership_type = ?, role = ?, admin_id = ? WHERE id = ?";
+
+                    }        }
+
+        try (Connection conn = DatabaseUtil.getConnection();
+
+             PreparedStatement stmt = conn.prepareStatement(sql)) {            return null;    }
+
+            
+
+            stmt.setString(1, member.getName());        }    
+
+            stmt.setInt(2, member.getAge());
+
+            stmt.setString(3, member.getContact());    }    @Override
+
+            stmt.setString(4, member.getEmail());
+
+            stmt.setString(5, member.getMembershipType());        public Member findById(int id) throws Exception {
+
+            stmt.setString(6, member.getUserRole());
+
+            if (member.getAdminId() != null) {    @Override        String sql = "SELECT * FROM members WHERE id = ?";
+
+                stmt.setInt(7, member.getAdminId());
+
+            } else {    public Member findByEmail(String email) throws Exception {        
+
+                stmt.setNull(7, Types.INTEGER);
+
+            }        String sql = "SELECT * FROM members WHERE email = ?";        try (Connection conn = DatabaseConnection.getConnection();
+
+            stmt.setInt(8, member.getId());
+
+                                 PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            int affectedRows = stmt.executeUpdate();
+
+            if (affectedRows == 0) {        try (Connection conn = DatabaseUtil.getConnection();            
+
+                throw new SQLException("Updating member failed, no rows affected.");
+
+            }             PreparedStatement stmt = conn.prepareStatement(sql)) {            stmt.setInt(1, id);
+
+        }
+
+    }                        ResultSet rs = stmt.executeQuery();
+
+    
+
+    @Override            stmt.setString(1, email);            
+
+    public void delete(int id) throws Exception {
+
+        String sql = "DELETE FROM members WHERE id = ?";            try (ResultSet rs = stmt.executeQuery()) {            if (rs.next()) {
+
+        
+
+        try (Connection conn = DatabaseUtil.getConnection();                if (rs.next()) {                return mapResultSetToMember(rs);
+
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+                                return mapResultSetToMember(rs);            }
+
+            stmt.setInt(1, id);
+
+            stmt.executeUpdate();                }            return null;
+
+        }
+
+    }            }        }
+
+    
+
+    @Override            return null;    }
+
+    public boolean authenticate(String email, String password) throws Exception {
+
+        String sql = "SELECT COUNT(*) FROM members WHERE email = ? AND password = ?";        }    
+
+        
+
+        try (Connection conn = DatabaseUtil.getConnection();    }    @Override
+
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+                    public Member findByEmail(String email) throws Exception {
+
+            stmt.setString(1, email);
+
+            stmt.setString(2, password);    @Override        String sql = "SELECT * FROM members WHERE email = ?";
+
+            try (ResultSet rs = stmt.executeQuery()) {
+
+                if (rs.next()) {    public List<Member> findAll() throws Exception {        
+
+                    return rs.getInt(1) > 0;
+
+                }        String sql = "SELECT * FROM members ORDER BY name";        try (Connection conn = DatabaseConnection.getConnection();
+
+            }
+
+            return false;        List<Member> members = new ArrayList<>();             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+        }
+
+    }                    
+
+    
+
+    private Member mapResultSetToMember(ResultSet rs) throws SQLException {        try (Connection conn = DatabaseUtil.getConnection();            stmt.setString(1, email);
+
+        Member member = new Member();
+
+        member.setId(rs.getInt("id"));             Statement stmt = conn.createStatement();            ResultSet rs = stmt.executeQuery();
+
+        member.setName(rs.getString("name"));
+
+        member.setAge(rs.getInt("age"));             ResultSet rs = stmt.executeQuery(sql)) {            
+
+        member.setContact(rs.getString("contact"));
+
+        member.setEmail(rs.getString("email"));                        if (rs.next()) {
+
+        member.setMembershipType(rs.getString("membership_type"));
+
+        member.setJoinDate(rs.getDate("join_date").toLocalDate());            while (rs.next()) {                return mapResultSetToMember(rs);
+
+        member.setUserRole(rs.getString("role"));
+
+        member.setPassword(rs.getString("password"));                members.add(mapResultSetToMember(rs));            }
+
+        Integer adminId = rs.getInt("admin_id");
+
+        if (!rs.wasNull()) {            }            return null;
+
+            member.setAdminId(adminId);
+
+        }        }        }
+
+        return member;
+
+    }        return members;    }
+
+}
+    }    
+
+    @Override
+
+    @Override    public List<Member> findAll() throws Exception {
+
+    public List<Member> findByAdminId(int adminId) throws Exception {        String sql = "SELECT * FROM members ORDER BY name";
+
+        String sql = "SELECT * FROM members WHERE admin_id = ? ORDER BY name";        List<Member> members = new ArrayList<>();
+
+        List<Member> members = new ArrayList<>();        
+
+                try (Connection conn = DatabaseConnection.getConnection();
+
+        try (Connection conn = DatabaseUtil.getConnection();             Statement stmt = conn.createStatement();
+
+             PreparedStatement stmt = conn.prepareStatement(sql)) {             ResultSet rs = stmt.executeQuery(sql)) {
+
+                        
+
+            stmt.setInt(1, adminId);            while (rs.next()) {
+
+            try (ResultSet rs = stmt.executeQuery()) {                members.add(mapResultSetToMember(rs));
+
+                while (rs.next()) {            }
+
+                    members.add(mapResultSetToMember(rs));        }
+
+                }        return members;
+
+            }    }
+
+        }    
+
+        return members;    @Override
+
+    }    public void update(Member member) throws Exception {
+
+            String sql = "UPDATE members SET name = ?, age = ?, contact = ?, email = ?, " +
+
+    @Override                    "membership_type = ?, user_role = ?, password = ? WHERE id = ?";
+
+    public void update(Member member) throws Exception {        
+
+        String sql = "UPDATE members SET name = ?, age = ?, contact = ?, email = ?, " +        try (Connection conn = DatabaseConnection.getConnection();
+
+                    "membership_type = ?, role = ?, admin_id = ? WHERE id = ?";             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+                    
+
+        try (Connection conn = DatabaseUtil.getConnection();            stmt.setString(1, member.getName());
+
+             PreparedStatement stmt = conn.prepareStatement(sql)) {            stmt.setInt(2, member.getAge());
+
+                        stmt.setString(3, member.getContact());
+
+            stmt.setString(1, member.getName());            stmt.setString(4, member.getEmail());
+
+            stmt.setInt(2, member.getAge());            stmt.setString(5, member.getMembershipType());
+
+            stmt.setString(3, member.getContact());            stmt.setString(6, member.getUserRole());
+
+            stmt.setString(4, member.getEmail());            stmt.setString(7, member.getPassword());
+
+            stmt.setString(5, member.getMembershipType());            stmt.setInt(8, member.getId());
+
+            stmt.setString(6, member.getUserRole());            
+
+            if (member.getAdminId() != null) {            stmt.executeUpdate();
+
+                stmt.setInt(7, member.getAdminId());        }
+
+            } else {    }
+
+                stmt.setNull(7, Types.INTEGER);    
+
+            }    @Override
+
+            stmt.setInt(8, member.getId());    public void delete(int id) throws Exception {
+
+                    String sql = "DELETE FROM members WHERE id = ?";
+
+            int affectedRows = stmt.executeUpdate();        
+
+            if (affectedRows == 0) {        try (Connection conn = DatabaseConnection.getConnection();
+
+                throw new SQLException("Updating member failed, no rows affected.");             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            }            
+
+        }            stmt.setInt(1, id);
+
+    }            stmt.executeUpdate();
+
+            }
+
+    @Override    }
+
+    public void delete(int id) throws Exception {    
+
+        String sql = "DELETE FROM members WHERE id = ?";    @Override
+
+            public boolean authenticate(String email, String password) throws Exception {
+
+        try (Connection conn = DatabaseUtil.getConnection();        String sql = "SELECT COUNT(*) FROM members WHERE email = ? AND password = ?";
+
+             PreparedStatement stmt = conn.prepareStatement(sql)) {        
+
+                    try (Connection conn = DatabaseConnection.getConnection();
+
+            stmt.setInt(1, id);             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.executeUpdate();            
+
+        }            stmt.setString(1, email);
+
+    }            stmt.setString(2, password);
+
+                ResultSet rs = stmt.executeQuery();
+
+    @Override            
+
+    public boolean authenticate(String email, String password) throws Exception {            if (rs.next()) {
+
+        String sql = "SELECT COUNT(*) FROM members WHERE email = ? AND password = ?";                return rs.getInt(1) > 0;
+
+                    }
+
+        try (Connection conn = DatabaseUtil.getConnection();            return false;
+
+             PreparedStatement stmt = conn.prepareStatement(sql)) {        }
+
+                }
+
+            stmt.setString(1, email);    
+
+            stmt.setString(2, password);    private Member mapResultSetToMember(ResultSet rs) throws SQLException {
+
+            try (ResultSet rs = stmt.executeQuery()) {        Member member = new Member();
+
+                if (rs.next()) {        member.setId(rs.getInt("id"));
+
+                    return rs.getInt(1) > 0;        member.setName(rs.getString("name"));
+
+                }        member.setAge(rs.getInt("age"));
+
+            }        member.setContact(rs.getString("contact"));
+
+            return false;        member.setEmail(rs.getString("email"));
+
+        }        member.setMembershipType(rs.getString("membership_type"));
+
+    }        member.setJoinDate(rs.getDate("join_date").toLocalDate());
+
+            member.setUserRole(rs.getString("user_role"));
+
+    private Member mapResultSetToMember(ResultSet rs) throws SQLException {        member.setPassword(rs.getString("password"));
+
+        Member member = new Member();        return member;
+
+        member.setId(rs.getInt("id"));    }
+
+        member.setName(rs.getString("name"));}
+        member.setAge(rs.getInt("age"));
+        member.setContact(rs.getString("contact"));
+        member.setEmail(rs.getString("email"));
+        member.setMembershipType(rs.getString("membership_type"));
+        member.setJoinDate(rs.getDate("join_date").toLocalDate());
+        member.setUserRole(rs.getString("role"));
+        member.setPassword(rs.getString("password"));
+        Integer adminId = rs.getInt("admin_id");
+        if (!rs.wasNull()) {
+            member.setAdminId(adminId);
+        }
+        return member;
+    }
+}
